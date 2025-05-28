@@ -1,3 +1,6 @@
+% To run this code, first install the following packages:
+% 1. IPFS (InterPlanetary File System) - this must be added to your system path.
+% 2. Ensure aes_encrypt and aes_decrypt functions are available in your MATLAB environment.
 
 % --- Step 1: Define Drones and Ground Station ---
 clc;
@@ -118,15 +121,6 @@ for i = 1:numDrones
 end
 
 randomDirection = @(maxVal) (rand()*2 - 1) * maxVal;  % Random direction function
-
-% --- SHA-256 Hash Function ---
-function hash = sha256(data)
-    import java.security.MessageDigest
-    md = MessageDigest.getInstance('SHA-256');
-    md.update(uint8(data));
-    hashBytes = md.digest();
-    hash = lower(sprintf('%02x', typecast(hashBytes, 'uint8')));
-end
 
 disp('Starting Multiple Drone Flight Simulation:');
 % Pause for 5 seconds at the start
@@ -340,7 +334,15 @@ end
 % Close the log file
 fclose(logFile);
 
-% --- Helper function: Haversine Distance Calculation ---
+% --- Helper Functions ---
+function hash = sha256(data)
+    import java.security.MessageDigest
+    md = MessageDigest.getInstance('SHA-256');
+    md.update(uint8(data));
+    hashBytes = md.digest();
+    hash = lower(sprintf('%02x', typecast(hashBytes, 'uint8')));
+end
+
 function distance = haversine(lat1, lon1, lat2, lon2)
     R = 6371000; % Radius of Earth in meters
     phi1 = deg2rad(lat1);
