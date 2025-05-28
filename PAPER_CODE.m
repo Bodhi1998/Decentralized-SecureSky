@@ -1,5 +1,3 @@
-% To run this code, first of all you need to insstall the following packages:
-% 1. IPFS (InterPlanetary File System) - this has to be addedd to your system path.
 
 % --- Step 1: Define Drones and Ground Station ---
 clc;
