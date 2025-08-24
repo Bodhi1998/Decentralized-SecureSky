@@ -1,6 +1,3 @@
-% To run this code, first of all you need to insstall the following packages:
-% 1. IPFS (InterPlanetary File System) - this has to be addedd to your system path.
-
 % --- Step 1: Define Drones and Ground Station ---
 clc;
 
@@ -81,8 +78,7 @@ set(noFlyZone.plot, 'XData', noFlyZoneLon, 'YData', noFlyZoneLat);
 % Initialize the drone plots (one for each drone, no flight path)
 for i = 1:numDrones
     drone(i).plot = plot(drone(i).longitude, drone(i).latitude, 'bo', 'MarkerSize', 12, ...
-                         'LineWidth', 2, 'MarkerFaceColor', 'b', 'DisplayName', sprintf('UID: %s (Out of Range)', drone(i).ID), ...
-                         'HandleVisibility', 'off'); % Initially out of range, hide in legend
+                         'LineWidth', 2, 'MarkerFaceColor', 'b', 'DisplayName', sprintf('UID: %s (Out of Range)', drone(i).ID));
 end
 
 % Set labels and title
@@ -102,7 +98,7 @@ for i = 1:numDrones
         'FontSize', 10, ...
         'FontWeight', 'bold', ...
         'HorizontalAlignment', 'left', ...
-        'String', ''); % Initially empty for out-of-range drones
+        'String', sprintf('Drone %d: Initializing...', i));
 end
 
 % --- Step 4: Simulate Drone Broadcasting ---
@@ -179,8 +175,7 @@ for t = 0:smoothStep:simulationTime
                                                 groundStation.latitude, groundStation.longitude);
             
             if distanceToGroundStation <= groundStation.range
-                % Drone is in range, show in legend and update text box
-                set(drone(i).plot, 'HandleVisibility', 'on'); % Show in legend
+                % Drone sends its ID to GCS
                 authenticated = false;
                 for j = 1:length(droneDatabase)
                     if strcmp(drone(i).ID, droneDatabase(j).ID)
@@ -206,7 +201,7 @@ for t = 0:smoothStep:simulationTime
                                     t, drone(i).ID, drone(i).latitude, drone(i).longitude);
                         end
                         
-                        % Update Remote ID display for drones in range
+                        % Update Remote ID display immediately
                         if authenticated
                             word1 = drone(i).Session_ID; % Use Session_ID for identification
                             word2 = num2str(drone(i).latitude);
@@ -327,12 +322,17 @@ for t = 0:smoothStep:simulationTime
                     end
                 end
             else
-                % Drone is out of range, hide from legend and clear text box
                 set(drone(i).plot, 'MarkerFaceColor', 'b', ...
-                    'DisplayName', sprintf('UID: %s (Out of Range)', drone(i).ID), ...
-                    'HandleVisibility', 'off');  % Hide from legend
-                set(drone(i).remoteIDDisplay, 'BackgroundColor', 'white', ...
-                    'String', ''); % Clear text box
+                    'DisplayName', sprintf('UID: %s (Out of Range)', drone(i).ID));  % Out of range: Blue
+                if distanceToNoFlyZone <= noFlyZone.radius
+                    set(drone(i).remoteIDDisplay, 'BackgroundColor', [1 0.7 0.7], ...
+                        'String', sprintf('ID: %s\nLat: %s\nLon: %s\nAlt: %s m\nSession_ID: Out of range\nRemark: Entering No-Fly Zone', ...
+                        drone(i).ID, num2str(drone(i).latitude), num2str(drone(i).longitude), num2str(drone(i).altitude)));
+                else
+                    set(drone(i).remoteIDDisplay, 'BackgroundColor', 'white', ...
+                        'String', sprintf('ID: %s\nLat: %s\nLon: %s\nAlt: %s m\nSession_ID: Out of range', ...
+                        drone(i).ID, num2str(drone(i).latitude), num2str(drone(i).longitude), num2str(drone(i).altitude)));
+                end
             end
         end
     end

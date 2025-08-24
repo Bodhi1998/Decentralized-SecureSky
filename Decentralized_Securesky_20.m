@@ -1,5 +1,6 @@
-% To run this code, first of all you need to insstall the following packages:
-% 1. IPFS (InterPlanetary File System) - this has to be addedd to your system path.
+% To run this code, first install the following packages:
+% 1. IPFS (InterPlanetary File System) - this must be added to your system path.
+% 2. Ensure aes_encrypt and aes_decrypt functions are available in your MATLAB environment.
 
 % --- Step 1: Define Drones and Ground Station ---
 clc;
@@ -7,12 +8,28 @@ clc;
 %----------Encryption and Decryption Key-------------
 key = fileread('endeckey.txt');
 
-% Define properties for 5 drones (3 authorized, 2 unauthorized)
+% Define properties for 21 drones (15 authorized, 6 unauthorized)
 drone(1).ID = 'ABC123'; % Authorized Drone 1
 drone(2).ID = 'DEF456'; % Authorized Drone 2
 drone(3).ID = 'GHI789'; % Authorized Drone 3
 drone(4).ID = 'JKL012'; % Unauthorized Drone 4 (Invalid registration)
 drone(5).ID = 'MNO345'; % Unauthorized Drone 5 (No permission)
+drone(6).ID = 'PQR678'; % Authorized Drone 6
+drone(7).ID = 'STU901'; % Authorized Drone 7
+drone(8).ID = 'VWX234'; % Authorized Drone 8
+drone(9).ID = 'YZA567'; % Unauthorized Drone 9 (Invalid registration)
+drone(10).ID = 'BCD890'; % Authorized Drone 10
+drone(11).ID = 'EFG123'; % Authorized Drone 11
+drone(12).ID = 'HIJ456'; % Authorized Drone 12
+drone(13).ID = 'KLM789'; % Unauthorized Drone 13 (No permission)
+drone(14).ID = 'NOP012'; % Authorized Drone 14
+drone(15).ID = 'QRS345'; % Authorized Drone 15
+drone(16).ID = 'TUV678'; % Authorized Drone 16
+drone(17).ID = 'WXY901'; % Unauthorized Drone 17 (Invalid registration)
+drone(18).ID = 'ZAB234'; % Authorized Drone 18
+drone(19).ID = 'CDE567'; % Authorized Drone 19
+drone(20).ID = 'FGH890'; % Unauthorized Drone 20 (No permission)
+drone(21).ID = 'IJK123'; % Authorized Drone 21
 
 % Ground Station (GCS) properties
 groundStation.range = 1000;  % Range in meters
@@ -20,9 +37,9 @@ groundStation.latitude = 37.7749; % Ground station location
 groundStation.longitude = -122.4194; % Ground station location
 
 % Position drones at the edge of the 1 km radius (1000 meters)
-numDrones = 5;
+numDrones = 21;
 angles = linspace(0, 2*pi, numDrones + 1); % Evenly spaced angles (0 to 2π)
-angles = angles(1:end-1); % Exclude the last angle to get 5 positions
+angles = angles(1:end-1); % Exclude the last angle to get 21 positions
 radius = groundStation.range; % 1000 meters
 
 for i = 1:numDrones
@@ -31,7 +48,7 @@ for i = 1:numDrones
     lonOffset = (radius / (111320 * cosd(groundStation.latitude))); % Meters to degrees longitude
     drone(i).latitude = groundStation.latitude + latOffset * cos(angles(i));
     drone(i).longitude = groundStation.longitude + lonOffset * sin(angles(i));
-    drone(i).altitude = 100 + (i-1)*10; % Altitudes: 100, 110, 120, 130, 140 meters
+    drone(i).altitude = 100 + (i-1)*5; % Altitudes: 100, 105, 110, 115, 120, etc. meters
     drone(i).speed = 0.0007;  % Speed for movement
     drone(i).flightZone = 'Permitted';  % Default flight zone
     drone(i).operatorID = ['Operator', num2str(i)];  % Unique operator ID
@@ -50,11 +67,11 @@ fprintf(logFile, 'UAV Violation Log\n');
 fprintf(logFile, '================\n');
 
 % --- Step 2: Define the Database ---
-droneDatabase = struct('ID', {'ABC123', 'DEF456', 'GHI789', 'JKL012', 'MNO345'}, ...
-                       'operator', {'Operator1', 'Operator2', 'Operator3', 'Operator4', 'Operator5'}, ...
-                       'registrationStatus', {'Valid', 'Valid', 'Valid', 'InValid', 'Valid'}, ...
-                       'allowedZones', {'Permitted', 'Permitted', 'Permitted', 'Permitted', 'No'}, ...
-                       'Session_ID', {'', '', '', '', ''}); % Session_ID storage
+droneDatabase = struct('ID', {'ABC123', 'DEF456', 'GHI789', 'JKL012', 'MNO345', 'PQR678', 'STU901', 'VWX234', 'YZA567', 'BCD890', 'EFG123', 'HIJ456', 'KLM789', 'NOP012', 'QRS345', 'TUV678', 'WXY901', 'ZAB234', 'CDE567', 'FGH890', 'IJK123'}, ...
+                       'operator', {'Operator1', 'Operator2', 'Operator3', 'Operator4', 'Operator5', 'Operator6', 'Operator7', 'Operator8', 'Operator9', 'Operator10', 'Operator11', 'Operator12', 'Operator13', 'Operator14', 'Operator15', 'Operator16', 'Operator17', 'Operator18', 'Operator19', 'Operator20', 'Operator21'}, ...
+                       'registrationStatus', {'Valid', 'Valid', 'Valid', 'InValid', 'Valid', 'Valid', 'Valid', 'Valid', 'InValid', 'Valid', 'Valid', 'Valid', 'Valid', 'Valid', 'Valid', 'Valid', 'InValid', 'Valid', 'Valid', 'Valid', 'Valid'}, ...
+                       'allowedZones', {'Permitted', 'Permitted', 'Permitted', 'Permitted', 'No', 'Permitted', 'Permitted', 'Permitted', 'Permitted', 'Permitted', 'Permitted', 'Permitted', 'No', 'Permitted', 'Permitted', 'Permitted', 'Permitted', 'Permitted', 'Permitted', 'No', 'Permitted'}, ...
+                       'Session_ID', {'', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''}); % Session_ID storage
 
 % --- Step 3: Setup the 2D Visualization ---
 f = figure('Name', 'UAV Simulation', 'NumberTitle', 'off', 'Color', [0.95 0.95 0.95]);
@@ -93,16 +110,32 @@ title('Decentralized SecureSky: Multi-UAV Simulation', 'FontSize', 18, 'FontWeig
 % Add legend
 legend('show', 'Location', 'northeast', 'FontSize', 12, 'Box', 'on', 'EdgeColor', [0.2 0.2 0.2]);
 
-% Create UI elements for each drone's Remote ID display
+% Create UI elements for each drone's Remote ID display with optimized layout
+% Split into two columns for better space utilization
+leftColumnDrones = 11; % First 11 drones in left column
 for i = 1:numDrones
-    drone(i).remoteIDDisplay = uicontrol('Style', 'text', ...
-        'Units', 'normalized', ...
-        'Position', [0.8 0.8 - (i-1)*0.1 0.18 0.08], ...
-        'BackgroundColor', 'white', ...
-        'FontSize', 10, ...
-        'FontWeight', 'bold', ...
-        'HorizontalAlignment', 'left', ...
-        'String', ''); % Initially empty for out-of-range drones
+    if i <= leftColumnDrones
+        % Left column
+        drone(i).remoteIDDisplay = uicontrol('Style', 'text', ...
+            'Units', 'normalized', ...
+            'Position', [0.8 0.95 - (i-1)*0.085 0.18 0.07], ...
+            'BackgroundColor', 'white', ...
+            'FontSize', 8, ...
+            'FontWeight', 'bold', ...
+            'HorizontalAlignment', 'left', ...
+            'String', ''); % Initially empty for out-of-range drones
+    else
+        % Right column (for drones 12-21)
+        rightColumnIndex = i - leftColumnDrones;
+        drone(i).remoteIDDisplay = uicontrol('Style', 'text', ...
+            'Units', 'normalized', ...
+            'Position', [0.99 0.95 - (rightColumnIndex-1)*0.085 0.18 0.07], ...
+            'BackgroundColor', 'white', ...
+            'FontSize', 8, ...
+            'FontWeight', 'bold', ...
+            'HorizontalAlignment', 'left', ...
+            'String', ''); % Initially empty for out-of-range drones
+    end
 end
 
 % --- Step 4: Simulate Drone Broadcasting ---
@@ -121,16 +154,7 @@ end
 
 randomDirection = @(maxVal) (rand()*2 - 1) * maxVal;  % Random direction function
 
-% --- SHA-256 Hash Function ---
-function hash = sha256(data)
-    import java.security.MessageDigest
-    md = MessageDigest.getInstance('SHA-256');
-    md.update(uint8(data));
-    hashBytes = md.digest();
-    hash = lower(sprintf('%02x', typecast(hashBytes, 'uint8')));
-end
-
-disp('Starting Multiple Drone Flight Simulation:');
+disp('Starting 21-Drone Flight Simulation:');
 % Pause for 5 seconds at the start
 pause(5);
 
@@ -144,11 +168,13 @@ for t = 0:smoothStep:simulationTime
         noFlyZoneLat = noFlyZone.centerLat + (noFlyZone.radius/111320) * cos(theta);
         noFlyZoneLon = noFlyZone.centerLon + (noFlyZone.radius/(111320*cosd(noFlyZone.centerLat))) * sin(theta);
         set(noFlyZone.plot, 'XData', noFlyZoneLon, 'YData', noFlyZoneLat);
+        % Immediately refresh the figure for no-fly zone update
+        drawnow;
         fprintf('No-Fly Zone moved to Lat: %.6f, Lon: %.6f at time %.1f s\n', ...
                 noFlyZone.centerLat, noFlyZone.centerLon, t);
     end
 
-    % --- Step 6: Random and Smooth Drone Movement ---
+    % --- Step 6: Process Each Drone Individually with Immediate Updates ---
     for i = 1:numDrones
         % Simulate random movement for each drone
         drone(i).latitude = drone(i).latitude + randomDirection(drone(i).speed);
@@ -156,6 +182,9 @@ for t = 0:smoothStep:simulationTime
 
         % Update drone's position on the plot
         set(drone(i).plot, 'XData', drone(i).longitude, 'YData', drone(i).latitude);
+        
+        % IMMEDIATE UPDATE: Refresh the figure as soon as position is updated
+        drawnow limitrate;
 
         % Log position every 1 second
         if mod(t, broadcastInterval) == 0
@@ -170,6 +199,8 @@ for t = 0:smoothStep:simulationTime
         if distanceToNoFlyZone <= noFlyZone.radius
             set(drone(i).plot, 'MarkerFaceColor', 'r', ...
                 'DisplayName', sprintf('UID: %s (In No-Fly Zone)', drone(i).ID));  % In no-fly zone: Red
+            % IMMEDIATE UPDATE: Refresh legend and plot
+            drawnow limitrate;
             fprintf('Drone ID: %s entered no-fly zone at time %.1f s!\n', drone(i).ID, t);
             fprintf(logFile, 'Time: %.1f s | Drone ID: %s | Violation: Entered No-Fly Zone | Lat: %.6f | Lon: %.6f\n', ...
                     t, drone(i).ID, drone(i).latitude, drone(i).longitude);
@@ -190,17 +221,21 @@ for t = 0:smoothStep:simulationTime
                             authenticated = true;
                             set(drone(i).plot, 'MarkerFaceColor', 'g', ...
                                 'DisplayName', sprintf('%s', drone(i).Session_ID));  % Authorized: Session_ID
+                            % IMMEDIATE UPDATE: Refresh as soon as authentication status changes
+                            drawnow limitrate;
                             fprintf('Drone ID: %s is authorized to fly!\n', drone(i).ID);
                             
                             % Assign Session_ID-style identifier if not already assigned
                             if isempty(drone(i).Session_ID)
-                                drone(i).Session_ID = sprintf('UAV-%s%d', char(65+i-1), 123 + i*111);
+                                drone(i).Session_ID = sprintf('UAV-%s%d', char(65+mod(i-1,26)), 123 + i*111);
                                 droneDatabase(j).Session_ID = drone(i).Session_ID; % Update database
                                 fprintf('Assigned Session_ID to Drone %s: %s\n', drone(i).ID, drone(i).Session_ID);
                             end
                         else
                             set(drone(i).plot, 'MarkerFaceColor', 'r', ...
                                 'DisplayName', sprintf('UID: %s (Unauthorized)', drone(i).ID));  % Unauthorized: UID
+                            % IMMEDIATE UPDATE: Refresh as soon as unauthorized status is detected
+                            drawnow limitrate;
                             fprintf('Drone ID: %s is unauthorized (invalid registration or zone)!\n', drone(i).ID);
                             fprintf(logFile, 'Time: %.1f s | Drone ID: %s | Violation: Unauthorized Entry | Lat: %.6f | Lon: %.6f\n', ...
                                     t, drone(i).ID, drone(i).latitude, drone(i).longitude);
@@ -233,28 +268,34 @@ for t = 0:smoothStep:simulationTime
                             fprintf(fileID, '%s', encryptedData);
                             fclose(fileID);
 
-                            % Add encrypted file and hash to IPFS
+                            % Add encrypted file and hash to IPFS with proper CID extraction
                             [status, cmdout] = system('ipfs add data_encrypted.txt');
                             if status == 0
-                                parts = strsplit(cmdout);
-                                cid = parts{2}; % Adjust index based on IPFS output
-                                disp('Present Remote ID Hash value of Blockchain - ');
-                                disp(['CID (Encrypted Data): ', cid]);
-                                fid = fopen('blockchainkey.txt', 'w');
-                                fwrite(fid, cid);
-                                fclose(fid);
-
-                                % Add hash file to IPFS
-                                [hashStatus, hashCmdout] = system('ipfs add data_hash.txt');
-                                if hashStatus == 0
-                                    hashParts = strsplit(hashCmdout);
-                                    hashCid = hashParts{2};
-                                    disp(['CID (SHA-256 Hash): ', hashCid]);
-                                    fid = fopen('blockchainkey_hash.txt', 'w');
-                                    fwrite(fid, hashCid);
+                                cid = extract_cid_from_ipfs_output(cmdout);
+                                if ~isempty(cid)
+                                    disp('Present Remote ID Hash value of Blockchain - ');
+                                    disp(['CID (Encrypted Data): ', cid]);
+                                    fid = fopen('blockchainkey.txt', 'w');
+                                    fwrite(fid, cid);
                                     fclose(fid);
+
+                                    % Add hash file to IPFS
+                                    [hashStatus, hashCmdout] = system('ipfs add data_hash.txt');
+                                    if hashStatus == 0
+                                        hashCid = extract_cid_from_ipfs_output(hashCmdout);
+                                        if ~isempty(hashCid)
+                                            disp(['CID (SHA-256 Hash): ', hashCid]);
+                                            fid = fopen('blockchainkey_hash.txt', 'w');
+                                            fwrite(fid, hashCid);
+                                            fclose(fid);
+                                        else
+                                            disp('Error extracting hash CID from IPFS output');
+                                        end
+                                    else
+                                        disp('Error adding hash file to IPFS');
+                                    end
                                 else
-                                    disp('Error adding hash file to IPFS');
+                                    disp('Error extracting CID from IPFS output');
                                 end
                             else
                                 disp('Error adding encrypted file to IPFS');
@@ -267,50 +308,70 @@ for t = 0:smoothStep:simulationTime
                                         'String', sprintf('Session_ID: %s\nLat: %s\nLon: %s\nAlt: %s m\nID: %s', ...
                                         drone(i).Session_ID, num2str(drone(i).latitude), num2str(drone(i).longitude), num2str(drone(i).altitude), drone(i).ID));
                                 end
+                                % IMMEDIATE UPDATE: Refresh UI display as soon as it's updated
+                                drawnow limitrate;
                                 continue; % Skip to next drone if IPFS fails
                             end
 
                             % Simulate GCS retrieving and decrypting data
-                            data = fileread('blockchainkey.txt');
-                            [status, ss] = system(['ipfs cat ', data]);
-                            if status == 0
-                                decryptedData = aes_decrypt(ss, key);
-                                % Verify hash
-                                computedHash = sha256(decryptedData);
-                                storedHash = fileread('data_hash.txt');
-                                hashVerified = strcmp(computedHash, storedHash);
-                                if hashVerified
-                                    fprintf('SHA-256 Hash Verification: Success\n');
+                            if exist('blockchainkey.txt', 'file')
+                                data = fileread('blockchainkey.txt');
+                                [status, ss] = system(['ipfs cat ', data]);
+                                if status == 0
+                                    decryptedData = aes_decrypt(ss, key);
+                                    % Verify hash
+                                    computedHash = sha256(decryptedData);
+                                    if exist('data_hash.txt', 'file')
+                                        storedHash = fileread('data_hash.txt');
+                                        hashVerified = strcmp(computedHash, storedHash);
+                                        if hashVerified
+                                            fprintf('SHA-256 Hash Verification: Success\n');
+                                        else
+                                            fprintf('SHA-256 Hash Verification: Failed\n');
+                                        end
+                                    else
+                                        fprintf('Warning: Hash file not found for verification\n');
+                                        hashVerified = false;
+                                    end
+                                    
+                                    parts = strsplit(decryptedData, ' ');
+                                    if length(parts) >= 5
+                                        fprintf('DroneWITH Session_ID: %s (ID: %s) authenticated successfully!\n', parts{1}, parts{5});
+                                        session_id = parts{1};
+                                        lat = parts{2};
+                                        lon = parts{3};
+                                        alt = parts{4};
+                                        idd = parts{5};
+                                        if distanceToNoFlyZone <= noFlyZone.radius
+                                            set(drone(i).remoteIDDisplay, 'BackgroundColor', [1 0.7 0.7], ...
+                                                'String', sprintf('Session_ID: %s\nLat: %s\nLon: %s\nAlt: %s m\nID: %s\nRemark: Entering No-Fly Zone', ...
+                                                session_id, lat, lon, alt, idd));
+                                        else
+                                            set(drone(i).remoteIDDisplay, 'BackgroundColor', 'white', ...
+                                                'String', sprintf('Session_ID: %s\nLat: %s\nLon: %s\nAlt: %s m\nID: %s', ...
+                                                session_id, lat, lon, alt, idd));
+                                        end
+                                        % IMMEDIATE UPDATE: Refresh UI display immediately after data processing
+                                        drawnow limitrate;
+                                    else
+                                        fprintf('Error: Decrypted data format is invalid\n');
+                                    end
                                 else
-                                    fprintf('SHA-256 Hash Verification: Failed\n');
-                                end
-                                parts = strsplit(decryptedData, ' ');
-                                fprintf('DroneWITH Session_ID: %s (ID: %s) authenticated successfully!\n', parts{1}, parts{5});
-                                session_id = parts{1};
-                                lat = parts{2};
-                                lon = parts{3};
-                                alt = parts{4};
-                                idd = parts{5};
-                                if distanceToNoFlyZone <= noFlyZone.radius
-                                    set(drone(i).remoteIDDisplay, 'BackgroundColor', [1 0.7 0.7], ...
-                                        'String', sprintf('Session_ID: %s\nLat: %s\nLon: %s\nAlt: %s m\nID: %s\nRemark: Entering No-Fly Zone', ...
-                                        session_id, lat, lon, alt, idd));
-                                else
-                                    set(drone(i).remoteIDDisplay, 'BackgroundColor', 'white', ...
-                                        'String', sprintf('Session_ID: %s\nLat: %s\nLon: %s\nAlt: %s m\nID: %s', ...
-                                        session_id, lat, lon, alt, idd));
+                                    disp('Error retrieving file from IPFS');
+                                    if distanceToNoFlyZone <= noFlyZone.radius
+                                        set(drone(i).remoteIDDisplay, 'BackgroundColor', [1 0.7 0.7], ...
+                                            'String', sprintf('Session_ID: %s\nLat: %s\nLon: %s\nAlt: %s m\nID: %s\nRemark: Entering No-Fly Zone', ...
+                                            drone(i).Session_ID, num2str(drone(i).latitude), num2str(drone(i).longitude), num2str(drone(i).altitude), drone(i).ID));
+                                    else
+                                        set(drone(i).remoteIDDisplay, 'BackgroundColor', 'white', ...
+                                            'String', sprintf('Session_ID: %s\nLat: %s\nLon: %s\nAlt: %s m\nID: %s', ...
+                                            drone(i).Session_ID, num2str(drone(i).latitude), num2str(drone(i).longitude), num2str(drone(i).altitude), drone(i).ID));
+                                    end
+                                    % IMMEDIATE UPDATE: Refresh UI display after error handling
+                                    drawnow limitrate;
                                 end
                             else
-                                disp('Error retrieving file from IPFS');
-                                if distanceToNoFlyZone <= noFlyZone.radius
-                                    set(drone(i).remoteIDDisplay, 'BackgroundColor', [1 0.7 0.7], ...
-                                        'String', sprintf('Session_ID: %s\nLat: %s\nLon: %s\nAlt: %s m\nID: %s\nRemark: Entering No-Fly Zone', ...
-                                        drone(i).Session_ID, num2str(drone(i).latitude), num2str(drone(i).longitude), num2str(drone(i).altitude), drone(i).ID));
-                                else
-                                    set(drone(i).remoteIDDisplay, 'BackgroundColor', 'white', ...
-                                        'String', sprintf('Session_ID: %s\nLat: %s\nLon: %s\nAlt: %s m\nID: %s', ...
-                                        drone(i).Session_ID, num2str(drone(i).latitude), num2str(drone(i).longitude), num2str(drone(i).altitude), drone(i).ID));
-                                end
+                                disp('Error: blockchainkey.txt file not found');
                             end
                         else
                             if distanceToNoFlyZone <= noFlyZone.radius
@@ -322,6 +383,8 @@ for t = 0:smoothStep:simulationTime
                                     'String', sprintf('ID: %s\nLat: %s\nLon: %s\nAlt: %s m\nSession_ID: Unauthorized', ...
                                     drone(i).ID, num2str(drone(i).latitude), num2str(drone(i).longitude), num2str(drone(i).altitude)));
                             end
+                            % IMMEDIATE UPDATE: Refresh UI display for unauthorized drones
+                            drawnow limitrate;
                         end
                         break;
                     end
@@ -333,16 +396,48 @@ for t = 0:smoothStep:simulationTime
                     'HandleVisibility', 'off');  % Hide from legend
                 set(drone(i).remoteIDDisplay, 'BackgroundColor', 'white', ...
                     'String', ''); % Clear text box
+                % IMMEDIATE UPDATE: Refresh display when drone goes out of range
+                drawnow limitrate;
             end
         end
+        
+        % IMMEDIATE UPDATE: Force a complete figure refresh after processing each drone
+        drawnow;
     end
-    pause(smoothStep);  % Pause for smooth movement
+    
+    % Small pause for smooth movement (optimized for 21 drones)
+    pause(smoothStep/4);  
 end
 
 % Close the log file
 fclose(logFile);
 
-% --- Helper function: Haversine Distance Calculation ---
+% --- Helper Functions ---
+function cid = extract_cid_from_ipfs_output(cmdout)
+    % Extract CID from IPFS add command output
+    % Expected format: "added QmXXXXX filename"
+    tokens = regexp(cmdout, 'added\s+(\w+)', 'tokens');
+    if ~isempty(tokens)
+        cid = tokens{1}{1};
+    else
+        % Fallback: try to find hash-like string (starts with Qm)
+        tokens = regexp(cmdout, '(Qm\w{44})', 'tokens');
+        if ~isempty(tokens)
+            cid = tokens{1}{1};
+        else
+            cid = '';
+        end
+    end
+end
+
+function hash = sha256(data)
+    import java.security.MessageDigest
+    md = MessageDigest.getInstance('SHA-256');
+    md.update(uint8(data));
+    hashBytes = md.digest();
+    hash = lower(sprintf('%02x', typecast(hashBytes, 'uint8')));
+end
+
 function distance = haversine(lat1, lon1, lat2, lon2)
     R = 6371000; % Radius of Earth in meters
     phi1 = deg2rad(lat1);

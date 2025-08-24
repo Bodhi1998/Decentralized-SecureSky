@@ -1,0 +1,160 @@
+UAV Multi-Attack Failure Demo Log - 06-May-2025 15:17:39
+====================================
+Attacks:
+ D4: Spoof D1 -> Replay D2
+ D5: NFZ Evasion
+ D3: MitM
+ D2: DB Tamper
+====================================
+0.0 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+0.0 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+0.0 s | Drone 3 | MitM Attack Failure | Reason: Decryption Failed (MitM)
+0.0 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+0.0 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+0.1 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+0.1 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+0.1 s | Drone 3 | MitM Attack Failure | Reason: Decryption Failed (MitM)
+0.1 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+0.1 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+0.2 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+0.2 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+0.2 s | Drone 3 | Verification Failure | Reason: Hash Mismatch (MitM)
+0.2 s | Drone 3 | MitM Attack Failure | Reason: Hash Mismatch (MitM)
+0.2 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+0.2 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+0.3 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+0.3 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+0.3 s | Drone 3 | MitM Attack Failure | Reason: Decryption Failed (MitM)
+0.3 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+0.3 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+0.4 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+0.4 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+0.4 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+0.4 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+0.5 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+0.5 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+0.5 s | Drone 3 | MitM Attack Failure | Reason: Decryption Failed (MitM)
+0.5 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+0.5 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+0.6 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+0.6 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+0.6 s | Drone 3 | MitM Attack Failure | Reason: Decryption Failed (MitM)
+0.6 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+0.6 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+0.7 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+0.7 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+0.7 s | Drone 3 | Verification Failure | Reason: Hash Mismatch (MitM)
+0.7 s | Drone 3 | MitM Attack Failure | Reason: Hash Mismatch (MitM)
+0.7 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+0.7 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+0.8 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+0.8 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+0.8 s | Drone 3 | Verification Failure | Reason: Hash Mismatch (MitM)
+0.8 s | Drone 3 | MitM Attack Failure | Reason: Hash Mismatch (MitM)
+0.8 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+0.8 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+0.9 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+0.9 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+0.9 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+0.9 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+1.0 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+1.0 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+1.0 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+1.0 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+1.1 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+1.1 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+1.1 s | Drone 3 | Verification Failure | Reason: Hash Mismatch (MitM)
+1.1 s | Drone 3 | MitM Attack Failure | Reason: Hash Mismatch (MitM)
+1.1 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+1.1 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+1.2 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+1.2 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+1.2 s | Drone 3 | MitM Attack Failure | Reason: Decryption Failed (MitM)
+1.2 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+1.2 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+1.3 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+1.3 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+1.3 s | Drone 3 | Verification Failure | Reason: Hash Mismatch (MitM)
+1.3 s | Drone 3 | MitM Attack Failure | Reason: Hash Mismatch (MitM)
+1.3 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+1.3 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+1.4 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+1.4 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+1.4 s | Drone 3 | Verification Failure | Reason: Hash Mismatch (MitM)
+1.4 s | Drone 3 | MitM Attack Failure | Reason: Hash Mismatch (MitM)
+1.4 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+1.4 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+1.5 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+1.5 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+1.5 s | Drone 3 | Verification Failure | Reason: Hash Mismatch (MitM)
+1.5 s | Drone 3 | MitM Attack Failure | Reason: Hash Mismatch (MitM)
+1.5 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+1.5 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+1.6 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+1.6 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+1.6 s | Drone 3 | Verification Failure | Reason: Hash Mismatch (MitM)
+1.6 s | Drone 3 | MitM Attack Failure | Reason: Hash Mismatch (MitM)
+1.6 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+1.6 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+1.7 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+1.7 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+1.7 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+1.7 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+1.8 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+1.8 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+1.8 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+1.8 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+1.9 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+1.9 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+1.9 s | Drone 3 | Verification Failure | Reason: Hash Mismatch (MitM)
+1.9 s | Drone 3 | MitM Attack Failure | Reason: Hash Mismatch (MitM)
+1.9 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+1.9 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+2.0 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+2.0 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+2.0 s | Drone 3 | Verification Failure | Reason: Hash Mismatch (MitM)
+2.0 s | Drone 3 | MitM Attack Failure | Reason: Hash Mismatch (MitM)
+2.0 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+2.0 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+2.1 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+2.1 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+2.1 s | Drone 3 | Verification Failure | Reason: Hash Mismatch (MitM)
+2.1 s | Drone 3 | MitM Attack Failure | Reason: Hash Mismatch (MitM)
+2.1 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+2.1 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+2.2 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+2.2 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+2.2 s | Drone 3 | Verification Failure | Reason: Hash Mismatch (MitM)
+2.2 s | Drone 3 | MitM Attack Failure | Reason: Hash Mismatch (MitM)
+2.2 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+2.2 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+2.3 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+2.3 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+2.3 s | Drone 3 | Verification Failure | Reason: Hash Mismatch (MitM)
+2.3 s | Drone 3 | MitM Attack Failure | Reason: Hash Mismatch (MitM)
+2.3 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+2.3 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+2.4 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+2.4 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+2.4 s | Drone 3 | Verification Failure | Reason: Hash Mismatch (MitM)
+2.4 s | Drone 3 | MitM Attack Failure | Reason: Hash Mismatch (MitM)
+2.4 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+2.4 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+2.5 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+2.5 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+2.5 s | Drone 3 | Verification Failure | Reason: Hash Mismatch (MitM)
+2.5 s | Drone 3 | MitM Attack Failure | Reason: Hash Mismatch (MitM)
+2.5 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+2.5 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+2.6 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+2.6 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+2.6 s | Drone 3 | Verification Failure | Reason: Hash Mismatch (MitM)
+2.6 s | Drone 3 | MitM Attack Failure | Reason: Hash Mismatch (MitM)
+2.6 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+2.6 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
+2.7 s | Drone 2 | Verification Failure | Reason: Hash Mismatch (DB Tamper)
+2.7 s | Drone 2 | Database Tamper Failure | Reason: Hash Mismatch (DB Tamper)
+2.7 s | Drone 3 | Verification Failure | Reason: Hash Mismatch (MitM)
+2.7 s | Drone 3 | MitM Attack Failure | Reason: Hash Mismatch (MitM)
+2.7 s | Drone 4 | ID Spoofing Failure | Reason: Zone Mismatch (Drone in Restricted, ID ABC123 needs Permitted)
+2.7 s | Drone 4 | Replay Attack Failure | Reason: Session ID Mismatch
