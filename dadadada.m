@@ -1,6 +1,3 @@
-% To run this code, first of all you need to insstall the following packages:
-% 1. IPFS (InterPlanetary File System) - this has to be addedd to your system path.
-
 % --- Step 1: Define Drones and Ground Station ---
 clc;
 
@@ -19,11 +16,11 @@ groundStation.range = 1000;  % Range in meters
 groundStation.latitude = 37.7749; % Ground station location
 groundStation.longitude = -122.4194; % Ground station location
 
-% Position drones at the edge of the 1 km radius (1000 meters)
+% Position drones at 1.1 km (1100 meters) from the ground station
 numDrones = 5;
 angles = linspace(0, 2*pi, numDrones + 1); % Evenly spaced angles (0 to 2π)
 angles = angles(1:end-1); % Exclude the last angle to get 5 positions
-radius = groundStation.range; % 1000 meters
+radius = 1100; % Increased from 1000 meters to 1100 meters
 
 for i = 1:numDrones
     % Convert radius to latitude/longitude offsets
@@ -57,7 +54,7 @@ droneDatabase = struct('ID', {'ABC123', 'DEF456', 'GHI789', 'JKL012', 'MNO345'},
                        'Session_ID', {'', '', '', '', ''}); % Session_ID storage
 
 % --- Step 3: Setup the 2D Visualization ---
-f = figure('Name', 'UAV Simulation', 'NumberTitle', 'off', 'Color', [0.95 0.95 0.95]);
+f = figure('Name', 'UAV Simulation with Compass', 'NumberTitle', 'off', 'Color', [0.95 0.95 0.95]);
 hold on;
 grid on;
 axis equal;
@@ -81,8 +78,7 @@ set(noFlyZone.plot, 'XData', noFlyZoneLon, 'YData', noFlyZoneLat);
 % Initialize the drone plots (one for each drone, no flight path)
 for i = 1:numDrones
     drone(i).plot = plot(drone(i).longitude, drone(i).latitude, 'bo', 'MarkerSize', 12, ...
-                         'LineWidth', 2, 'MarkerFaceColor', 'b', 'DisplayName', sprintf('UID: %s (Out of Range)', drone(i).ID), ...
-                         'HandleVisibility', 'off'); % Initially out of range, hide in legend
+                         'LineWidth', 2, 'MarkerFaceColor', 'b', 'DisplayName', sprintf('UID: %s (Out of Range)', drone(i).ID));
 end
 
 % Set labels and title
@@ -102,10 +98,13 @@ for i = 1:numDrones
         'FontSize', 10, ...
         'FontWeight', 'bold', ...
         'HorizontalAlignment', 'left', ...
-        'String', ''); % Initially empty for out-of-range drones
+        'String', sprintf('Drone %d: Initializing...', i));
 end
 
-% --- Step 4: Simulate Drone Broadcasting ---
+% Add new compass rose
+drawCompassRose();
+
+% --- Step 4: Setup Simulation Parameters ---
 broadcastInterval = 1; % Remote ID broadcast every 1 second
 smoothStep = 0.05; % Smooth movement (20 Hz)
 simulationTime = 2000; % Simulation time (seconds)
@@ -121,6 +120,18 @@ end
 
 randomDirection = @(maxVal) (rand()*2 - 1) * maxVal;  % Random direction function
 
+% --- Step 5: Setup Timer for Simulation ---
+% Create a timer object to control the simulation loop
+simTimer = timer(...
+    'ExecutionMode', 'fixedRate', ... % Execute TimerFcn at a fixed rate
+    'Period', smoothStep, ... % Timer fires every 0.05 seconds (20 Hz)
+    'TasksToExecute', int32(simulationTime / smoothStep), ... % Total number of executions (2000 / 0.05 = 40000)
+    'StartDelay', 5, ... % 5-second pause at the start
+    'TimerFcn', @timerCallback, ... % Callback function for each timer tick
+    'StopFcn', @stopCallback, ... % Callback when the timer stops
+    'UserData', struct('t', 0, 'drone', drone, 'noFlyZone', noFlyZone, 'logFile', logFile) ... % Pass simulation state
+);
+
 % --- SHA-256 Hash Function ---
 function hash = sha256(data)
     import java.security.MessageDigest
@@ -130,17 +141,29 @@ function hash = sha256(data)
     hash = lower(sprintf('%02x', typecast(hashBytes, 'uint8')));
 end
 
+% Start the simulation
 disp('Starting Multiple Drone Flight Simulation:');
-% Pause for 5 seconds at the start
-pause(5);
+start(simTimer);
 
-for t = 0:smoothStep:simulationTime
-    % --- Step 5: Update No-Fly Zone Position ---
+% Wait for the timer to finish
+wait(simTimer);
+
+% --- Timer Callback Function ---
+function timerCallback(timerObj, ~)
+    % Retrieve simulation state from UserData
+    simState = get(timerObj, 'UserData');
+    t = simState.t;
+    drone = simState.drone;
+    noFlyZone = simState.noFlyZone;
+    logFile = simState.logFile;
+
+    % --- Step 6: Update No-Fly Zone Position ---
     if t - noFlyZone.lastUpdate >= noFlyZoneUpdateInterval
         noFlyZone.centerLat = 37.7749 + (rand() * 0.002 - 0.001); % Random new latitude
         noFlyZone.centerLon = -122.4194 + (rand() * 0.002 - 0.001); % Random new longitude
         noFlyZone.lastUpdate = t;
         % Update no-fly zone plot
+        theta = linspace(0, 2*pi, 100);
         noFlyZoneLat = noFlyZone.centerLat + (noFlyZone.radius/111320) * cos(theta);
         noFlyZoneLon = noFlyZone.centerLon + (noFlyZone.radius/(111320*cosd(noFlyZone.centerLat))) * sin(theta);
         set(noFlyZone.plot, 'XData', noFlyZoneLon, 'YData', noFlyZoneLat);
@@ -148,7 +171,7 @@ for t = 0:smoothStep:simulationTime
                 noFlyZone.centerLat, noFlyZone.centerLon, t);
     end
 
-    % --- Step 6: Random and Smooth Drone Movement ---
+    % --- Step 7: Random and Smooth Drone Movement ---
     for i = 1:numDrones
         % Simulate random movement for each drone
         drone(i).latitude = drone(i).latitude + randomDirection(drone(i).speed);
@@ -164,7 +187,7 @@ for t = 0:smoothStep:simulationTime
             drone(i).longitudeLog(drone(i).fullSecondCounter) = drone(i).longitude;
         end
 
-        % --- Step 7: Check No-Fly Zone ---
+        % --- Step 8: Check No-Fly Zone ---
         distanceToNoFlyZone = haversine(drone(i).latitude, drone(i).longitude, ...
                                         noFlyZone.centerLat, noFlyZone.centerLon);
         if distanceToNoFlyZone <= noFlyZone.radius
@@ -174,13 +197,12 @@ for t = 0:smoothStep:simulationTime
             fprintf(logFile, 'Time: %.1f s | Drone ID: %s | Violation: Entered No-Fly Zone | Lat: %.6f | Lon: %.6f\n', ...
                     t, drone(i).ID, drone(i).latitude, drone(i).longitude);
         else
-            % --- Step 8: Simulate Drone Sending ID to GCS ---
+            % --- Step 9: Simulate Drone Sending ID to GCS ---
             distanceToGroundStation = haversine(drone(i).latitude, drone(i).longitude, ...
                                                 groundStation.latitude, groundStation.longitude);
             
             if distanceToGroundStation <= groundStation.range
-                % Drone is in range, show in legend and update text box
-                set(drone(i).plot, 'HandleVisibility', 'on'); % Show in legend
+                % Drone sends its ID to GCS
                 authenticated = false;
                 for j = 1:length(droneDatabase)
                     if strcmp(drone(i).ID, droneDatabase(j).ID)
@@ -206,7 +228,7 @@ for t = 0:smoothStep:simulationTime
                                     t, drone(i).ID, drone(i).latitude, drone(i).longitude);
                         end
                         
-                        % Update Remote ID display for drones in range
+                        % Update Remote ID display immediately
                         if authenticated
                             word1 = drone(i).Session_ID; % Use Session_ID for identification
                             word2 = num2str(drone(i).latitude);
@@ -327,20 +349,40 @@ for t = 0:smoothStep:simulationTime
                     end
                 end
             else
-                % Drone is out of range, hide from legend and clear text box
                 set(drone(i).plot, 'MarkerFaceColor', 'b', ...
-                    'DisplayName', sprintf('UID: %s (Out of Range)', drone(i).ID), ...
-                    'HandleVisibility', 'off');  % Hide from legend
-                set(drone(i).remoteIDDisplay, 'BackgroundColor', 'white', ...
-                    'String', ''); % Clear text box
+                    'DisplayName', sprintf('UID: %s (Out of Range)', drone(i).ID));  % Out of range: Blue
+                if distanceToNoFlyZone <= noFlyZone.radius
+                    set(drone(i).remoteIDDisplay, 'BackgroundColor', [1 0.7 0.7], ...
+                        'String', sprintf('ID: %s\nLat: %s\nLon: %s\nAlt: %s m\nSession_ID: Out of range\nRemark: Entering No-Fly Zone', ...
+                        drone(i).ID, num2str(drone(i).latitude), num2str(drone(i).longitude), num2str(drone(i).altitude)));
+                else
+                    set(drone(i).remoteIDDisplay, 'BackgroundColor', 'white', ...
+                        'String', sprintf('ID: %s\nLat: %s\nLon: %s\nAlt: %s m\nSession_ID: Out of range', ...
+                        drone(i).ID, num2str(drone(i).latitude), num2str(drone(i).longitude), num2str(drone(i).altitude)));
+                end
             end
         end
     end
-    pause(smoothStep);  % Pause for smooth movement
+
+    % Update simulation state
+    simState.t = t + smoothStep;
+    simState.drone = drone;
+    simState.noFlyZone = noFlyZone;
+    set(timerObj, 'UserData', simState);
 end
 
-% Close the log file
-fclose(logFile);
+% --- Stop Callback Function ---
+function stopCallback(timerObj, ~)
+    % Retrieve simulation state
+    simState = get(timerObj, 'UserData');
+    logFile = simState.logFile;
+
+    % Close the log file
+    fclose(logFile);
+
+    % Clean up the timer object
+    delete(timerObj);
+end
 
 % --- Helper function: Haversine Distance Calculation ---
 function distance = haversine(lat1, lon1, lat2, lon2)
@@ -355,4 +397,46 @@ function distance = haversine(lat1, lon1, lat2, lon2)
     c = 2 * atan2(sqrt(a), sqrt(1 - a));
 
     distance = R * c;  % Output distance in meters
+end
+
+% --- Helper function: Draw Compass Rose ---
+function drawCompassRose()
+    % Create an inset axes for the compass rose in the bottom-right corner
+    axCompass = axes('Position', [0.65, 0.05, 0.2, 0.2]); % [left, bottom, width, height]
+    hold(axCompass, 'on');
+    
+    % Define angles for the arrows (in degrees, matching the image)
+    arrowAnglesDeg = [0, 30, 90, 180, 270]; % Angles for arrows
+    arrowColors = {'r', 'c', 'b', 'm', 'g'}; % Colors matching the image (red, cyan, blue, magenta, green)
+    
+    % Convert angles to radians for polarplot
+    arrowAnglesRad = deg2rad(arrowAnglesDeg);
+    
+    % Plot the arrows
+    for i = 1:length(arrowAnglesRad)
+        % Plot an arrow from the center (0) to the edge (2)
+        polarplot(axCompass, [arrowAnglesRad(i), arrowAnglesRad(i)], [0, 2], ...
+            'Color', arrowColors{i}, 'LineWidth', 2, 'Marker', '>', ...
+            'MarkerSize', 8, 'MarkerFaceColor', arrowColors{i}, ...
+            'HandleVisibility', 'off');
+    end
+    
+    % Customize the polar plot to resemble the compass rose in the image
+    set(axCompass, 'ThetaTick', 0:30:360, ... % Angle ticks every 30 degrees
+        'RTick', 0:0.5:2, ... % Radial ticks
+        'GridColor', [0.5 0.5 0.5], ... % Gray grid lines
+        'GridAlpha', 0.5, ...
+        'FontSize', 8, ...
+        'FontWeight', 'bold');
+    
+    % Set the maximum radius to 2 (as in the image)
+    rlim(axCompass, [0 2]);
+    
+    % Adjust the appearance
+    axCompass.Color = [0.9 0.9 0.9]; % Light gray background
+    axCompass.ThetaDir = 'clockwise'; % Match the image's orientation
+    axCompass.ThetaZeroLocation = 'top'; % 0 degrees at the top (North)
+    
+    % Add a title to the compass rose (optional)
+    title(axCompass, 'Compass', 'FontSize', 10, 'FontWeight', 'bold');
 end

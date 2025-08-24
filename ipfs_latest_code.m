@@ -1,6 +1,3 @@
-% To run this code, first of all you need to insstall the following packages:
-% 1. IPFS (InterPlanetary File System) - this has to be addedd to your system path.
-
 % --- Step 1: Define Drones and Ground Station ---
 clc;
 
@@ -14,29 +11,25 @@ drone(3).ID = 'GHI789'; % Authorized Drone 3
 drone(4).ID = 'JKL012'; % Unauthorized Drone 4 (Invalid registration)
 drone(5).ID = 'MNO345'; % Unauthorized Drone 5 (No permission)
 
-% Ground Station (GCS) properties
-groundStation.range = 1000;  % Range in meters
-groundStation.latitude = 37.7749; % Ground station location
-groundStation.longitude = -122.4194; % Ground station location
+% Initial positions of the drones (starting around the same area)
+initial_latitudes = [37.7749, 37.7740, 37.7750, 37.7730, 37.7729];
+initial_longitudes = [-122.4194, -122.4185, -122.4200, -122.4170, -122.4165];
+initial_altitudes = [100, 120, 110, 105, 130];
 
-% Position drones at the edge of the 1 km radius (1000 meters)
-numDrones = 5;
-angles = linspace(0, 2*pi, numDrones + 1); % Evenly spaced angles (0 to 2π)
-angles = angles(1:end-1); % Exclude the last angle to get 5 positions
-radius = groundStation.range; % 1000 meters
-
-for i = 1:numDrones
-    % Convert radius to latitude/longitude offsets
-    latOffset = (radius / 111320); % Meters to degrees latitude
-    lonOffset = (radius / (111320 * cosd(groundStation.latitude))); % Meters to degrees longitude
-    drone(i).latitude = groundStation.latitude + latOffset * cos(angles(i));
-    drone(i).longitude = groundStation.longitude + lonOffset * sin(angles(i));
-    drone(i).altitude = 100 + (i-1)*10; % Altitudes: 100, 110, 120, 130, 140 meters
+for i = 1:5
+    drone(i).latitude = initial_latitudes(i);  % Starting latitude
+    drone(i).longitude = initial_longitudes(i);  % Starting longitude
+    drone(i).altitude = initial_altitudes(i);  % Altitude in meters
     drone(i).speed = 0.0007;  % Speed for movement
     drone(i).flightZone = 'Permitted';  % Default flight zone
     drone(i).operatorID = ['Operator', num2str(i)];  % Unique operator ID
     drone(i).Session_ID = '';  % Session_ID-style identifier
 end
+
+% Ground Station (GCS) properties
+groundStation.range = 1000;  % Range in meters
+groundStation.latitude = 37.7749; % Ground station location
+groundStation.longitude = -122.4194; % Ground station location
 
 % Define No-Fly Zone (small circular area, randomly placed)
 noFlyZone.radius = 200; % Radius in meters (smaller size)
@@ -79,10 +72,9 @@ noFlyZoneLon = noFlyZone.centerLon + (noFlyZone.radius/(111320*cosd(noFlyZone.ce
 set(noFlyZone.plot, 'XData', noFlyZoneLon, 'YData', noFlyZoneLat);
 
 % Initialize the drone plots (one for each drone, no flight path)
-for i = 1:numDrones
+for i = 1:5
     drone(i).plot = plot(drone(i).longitude, drone(i).latitude, 'bo', 'MarkerSize', 12, ...
-                         'LineWidth', 2, 'MarkerFaceColor', 'b', 'DisplayName', sprintf('UID: %s (Out of Range)', drone(i).ID), ...
-                         'HandleVisibility', 'off'); % Initially out of range, hide in legend
+                         'LineWidth', 2, 'MarkerFaceColor', 'b', 'DisplayName', sprintf('UID: %s (Out of Range)', drone(i).ID));
 end
 
 % Set labels and title
@@ -94,7 +86,7 @@ title('Decentralized SecureSky: Multi-UAV Simulation', 'FontSize', 18, 'FontWeig
 legend('show', 'Location', 'northeast', 'FontSize', 12, 'Box', 'on', 'EdgeColor', [0.2 0.2 0.2]);
 
 % Create UI elements for each drone's Remote ID display
-for i = 1:numDrones
+for i = 1:5
     drone(i).remoteIDDisplay = uicontrol('Style', 'text', ...
         'Units', 'normalized', ...
         'Position', [0.8 0.8 - (i-1)*0.1 0.18 0.08], ...
@@ -102,7 +94,7 @@ for i = 1:numDrones
         'FontSize', 10, ...
         'FontWeight', 'bold', ...
         'HorizontalAlignment', 'left', ...
-        'String', ''); % Initially empty for out-of-range drones
+        'String', sprintf('Drone %d: Initializing...', i));
 end
 
 % --- Step 4: Simulate Drone Broadcasting ---
@@ -112,7 +104,7 @@ simulationTime = 2000; % Simulation time (seconds)
 noFlyZoneUpdateInterval = 30; % Update no-fly zone every 30 seconds
 
 % Initialize arrays for each drone's movement
-for i = 1:numDrones
+for i = 1:5
     drone(i).time = 0:broadcastInterval:simulationTime;
     drone(i).latitudeLog = zeros(1, length(drone(i).time));
     drone(i).longitudeLog = zeros(1, length(drone(i).time));
@@ -130,10 +122,7 @@ function hash = sha256(data)
     hash = lower(sprintf('%02x', typecast(hashBytes, 'uint8')));
 end
 
-disp('Starting Multiple Drone Flight Simulation:');
-% Pause for 5 seconds at the start
-pause(5);
-
+%disp('Starting Multiple Drone Flight Simulation:');
 for t = 0:smoothStep:simulationTime
     % --- Step 5: Update No-Fly Zone Position ---
     if t - noFlyZone.lastUpdate >= noFlyZoneUpdateInterval
@@ -149,7 +138,7 @@ for t = 0:smoothStep:simulationTime
     end
 
     % --- Step 6: Random and Smooth Drone Movement ---
-    for i = 1:numDrones
+    for i = 1:5
         % Simulate random movement for each drone
         drone(i).latitude = drone(i).latitude + randomDirection(drone(i).speed);
         drone(i).longitude = drone(i).longitude + randomDirection(drone(i).speed);
@@ -171,16 +160,16 @@ for t = 0:smoothStep:simulationTime
             set(drone(i).plot, 'MarkerFaceColor', 'r', ...
                 'DisplayName', sprintf('UID: %s (In No-Fly Zone)', drone(i).ID));  % In no-fly zone: Red
             fprintf('Drone ID: %s entered no-fly zone at time %.1f s!\n', drone(i).ID, t);
-            fprintf(logFile, 'Time: %.1f s | Drone ID: %s | Violation: Entered No-Fly Zone | Lat: %.6f | Lon: %.6f\n', ...
-                    t, drone(i).ID, drone(i).latitude, drone(i).longitude);
+            timestamp = datestr(now, 'yyyy-mm-dd HH:MM:SS');
+            fprintf(logFile, 'Timestamp: %s | Drone ID: %s | Violation: Entered No-Fly Zone | Lat: %.6f | Lon: %.6f\n', ...
+                    timestamp, drone(i).ID, drone(i).latitude, drone(i).longitude);
         else
             % --- Step 8: Simulate Drone Sending ID to GCS ---
             distanceToGroundStation = haversine(drone(i).latitude, drone(i).longitude, ...
                                                 groundStation.latitude, groundStation.longitude);
             
             if distanceToGroundStation <= groundStation.range
-                % Drone is in range, show in legend and update text box
-                set(drone(i).plot, 'HandleVisibility', 'on'); % Show in legend
+                % Drone sends its ID to GCS
                 authenticated = false;
                 for j = 1:length(droneDatabase)
                     if strcmp(drone(i).ID, droneDatabase(j).ID)
@@ -202,11 +191,12 @@ for t = 0:smoothStep:simulationTime
                             set(drone(i).plot, 'MarkerFaceColor', 'r', ...
                                 'DisplayName', sprintf('UID: %s (Unauthorized)', drone(i).ID));  % Unauthorized: UID
                             fprintf('Drone ID: %s is unauthorized (invalid registration or zone)!\n', drone(i).ID);
-                            fprintf(logFile, 'Time: %.1f s | Drone ID: %s | Violation: Unauthorized Entry | Lat: %.6f | Lon: %.6f\n', ...
-                                    t, drone(i).ID, drone(i).latitude, drone(i).longitude);
+                            timestamp = datestr(now, 'yyyy-mm-dd HH:MM:SS');
+                            fprintf(logFile, 'Timestamp: %s | Drone ID: %s | Violation: Unauthorized Entry | Lat: %.6f | Lon: %.6f\n', ...
+                                    timestamp, drone(i).ID, drone(i).latitude, drone(i).longitude);
                         end
                         
-                        % Update Remote ID display for drones in range
+                        % Update Remote ID display immediately
                         if authenticated
                             word1 = drone(i).Session_ID; % Use Session_ID for identification
                             word2 = num2str(drone(i).latitude);
@@ -327,12 +317,17 @@ for t = 0:smoothStep:simulationTime
                     end
                 end
             else
-                % Drone is out of range, hide from legend and clear text box
                 set(drone(i).plot, 'MarkerFaceColor', 'b', ...
-                    'DisplayName', sprintf('UID: %s (Out of Range)', drone(i).ID), ...
-                    'HandleVisibility', 'off');  % Hide from legend
-                set(drone(i).remoteIDDisplay, 'BackgroundColor', 'white', ...
-                    'String', ''); % Clear text box
+                    'DisplayName', sprintf('UID: %s (Out of Range)', drone(i).ID));  % Out of range: Blue
+                if distanceToNoFlyZone <= noFlyZone.radius
+                    set(drone(i).remoteIDDisplay, 'BackgroundColor', [1 0.7 0.7], ...
+                        'String', sprintf('ID: %s\nLat: %s\nLon: %s\nAlt: %s m\nSession_ID: Out of range\nRemark: Entering No-Fly Zone', ...
+                        drone(i).ID, num2str(drone(i).latitude), num2str(drone(i).longitude), num2str(drone(i).altitude)));
+                else
+                    set(drone(i).remoteIDDisplay, 'BackgroundColor', 'white', ...
+                        'String', sprintf('ID: %s\nLat: %s\nLon: %s\nAlt: %s m\nSession_ID: Out of range', ...
+                        drone(i).ID, num2str(drone(i).latitude), num2str(drone(i).longitude), num2str(drone(i).altitude)));
+                end
             end
         end
     end
